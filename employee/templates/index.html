@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <title>CRUD - ABA INTERNSHIP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A simple crud app made with the vue js and django">
+
+    <meta name="keywords" content="vuejs, django, crudapp, restapi">
+    <!-- bootstap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- boostrap css -->
+    <style>
+    /* Absolute Center Spinner */
+.loading {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+/* Transparent Overlay */
+.loading:before {
+  content: '';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.3);
+}
+
+/* :not(:required) hides these rules from IE9 and below */
+.loading:not(:required) {
+  /* hide "loading..." text */
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+
+.loading:not(:required):after {
+  content: '';
+  display: block;
+  font-size: 10px;
+  width: 1em;
+  height: 1em;
+  margin-top: -0.5em;
+  -webkit-animation: spinner 1500ms infinite linear;
+  -moz-animation: spinner 1500ms infinite linear;
+  -ms-animation: spinner 1500ms infinite linear;
+  -o-animation: spinner 1500ms infinite linear;
+  animation: spinner 1500ms infinite linear;
+  border-radius: 0.5em;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+  box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0, rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+}
+
+/* Animation */
+
+@-webkit-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-moz-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-o-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+    </style>
+
+  </head>
+
+  <body>
+    <div id="starting">
+      <div class="container">
+        <div class="row">
+          <h1>List of Employees
+          <button  type="button" class="btn btn-primary" data-toggle="modal" data-target="#addEmployeeModal">ADD EMPLOYEE</button>
+          </h1>
+          <div class="form-inline my-2 my-lg-0" style="margin-left: auto;">
+            <input class="form-control mr-sm-2" type="text" placeholder="Search" v-model="search_term" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" v-on:click.prevent="getEmployees()">Search</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Department</th>
+              </tr>
+            </thead>
+            <tbody>
+             <tr v-for="employee in employees">
+               <th scope="row">${employee.employee_id}</th>
+               <td>${employee.employee_name}</td>
+               <td>${employee.employee_department}</td>
+                 <td>
+                   <button class="btn btn-info" v-on:click="getEmployee(employee.employee_id)">Edit</button>
+                   <button class="btn btn-danger" v-on:click="deleteEmployee(employee.employee_id)">Delete</button>
+                  </td>
+                </tr>
+            </tbody>
+          </table>
+          <!-- Add Article Modal -->
+          <div class="modal fade" id="addEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle">ADD EMPLOYEE</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form v-on:submit.prevent="addEmployee()">
+                <div class="modal-body">
+                    <div class="form-group">
+                      <label for="employee_name">Employee's Name</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="employee_name"
+                        placeholder="Enter Employee's Name"
+                        v-model="newEmployee.employee_name"
+                        required="required" >
+                    </div>
+                    <div class="form-group">
+                      <label for="employee_birth">Employee's Birth</label>
+                      <input
+                        class="form-control"
+                        id="employee_birth"
+                        placeholder="Enter Employee's Birth"
+                        v-model="newEmployee.employee_birth"
+                        required="required" >
+                    </div>
+                    <div class="form-group">
+                      <label for="employee_department">Employee's Department</label>
+                      <input
+                        class="form-control"
+                        id="employee_department"
+                        placeholder="Enter Employee's Department"
+                        v-model="newEmployee.employee_department"
+                        required="required" >
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary m-progress" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+                </form>
+              </div>
+            </div>
+            <div class="loading" v-if="loading===true">Loading&#8230;</div>
+          </div>
+          <!-- End of add article modal -->
+          <!-- Edit Article Modal -->
+          <div class="modal fade" id="editEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle">EDIT EMPLOYEE</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form v-on:submit.prevent="updateEmployee()">
+                <div class="modal-body">
+                    <div class="form-group">
+                      <label for="employee_name">Employee's Name</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="employee_name"
+                        placeholder="Enter Employee's Name"
+                        v-model="currentEmployee.employee_name"
+                        required="required" >
+                    </div>
+                    <div class="form-group">
+                      <label for="employee_birth">Employee's Birth</label>
+                      <textarea
+                        class="form-control"
+                        id="employee_birth"
+                        placeholder="Enter Employee's Birth"
+                        v-model="currentEmployee.employee_birth"
+                        required="required"
+                        rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                       <label for="employee_department">Employee's Department</label>
+                       <textarea
+                         class="form-control"
+                         id="employee_department"
+                         placeholder="Enter Employee's Department"
+                         v-model="currentEmployee.employee_department"
+                         required="required"
+                         rows="3"></textarea>
+                     </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary m-progress" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+                </form>
+              </div>
+            </div>
+            <div class="loading" v-if="loading===true">Loading&#8230;</div>
+          </div>
+          <!-- End of edit article modal -->
+
+        </div>
+      </div>
+      <div class="loading" v-if="loading===true">Loading&#8230;</div>
+
+    </div>
+
+  <!-- bootrtap js files -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+  <!-- vue.js files -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.5"></script>
+  <script type="text/javascript">
+    Vue.http.headers.common['X-CSRFToken'] = "{{ csrf_token }}";
+    new Vue({
+      el: '#starting',
+      delimiters: ['${','}'],
+      data: {
+        employees: [],
+        loading: true,
+        currentEmployee: {},
+        message: null,
+        newEmployee: { 'employee_name': null, 'employee_birth': null, 'employee_department': null },
+        search_term: '',
+      },
+      mounted: function() {
+        this.getEmployees();
+      },
+      methods: {
+        getEmployees: function() {
+          let api_url = '/api/employee/';
+          if(this.search_term!==''||this.search_term!==null) {
+            api_url = '/api/employee/?search=${this.search_term}'
+          }
+          this.loading = true;
+          this.$http.get(api_url)
+              .then((response) => {
+                this.employees = response.data;
+                this.loading = false;
+              })
+              .catch((err) => {
+                this.loading = false;
+                console.log(err);
+              })
+        },
+        getEmployees: function(id) {
+          this.loading = true;
+          this.$http.get('/api/employee/${id}/')
+              .then((response) => {
+                this.currentEmployee = response.data;
+                $("#editEmployeeModal").modal('show');
+                this.loading = false;
+              })
+              .catch((err) => {
+                this.loading = false;
+                console.log(err);
+              })
+        },
+        addEmployee: function() {
+          this.loading = true;
+          this.$http.post('/api/employee/',this.newEmployee)
+              .then((response) => {
+                this.loading = true;
+                this.getEmployees();
+              })
+              .catch((err) => {
+                this.loading = true;
+                console.log(err);
+              })
+        },
+        updateEmployee: function() {
+          this.loading = true;
+          this.$http.put('/api/employee/${this.currentEmployee.employee_id}/', this.currentEmployee)
+              .then((response) => {
+                this.loading = false;
+                this.currentEmployee = response.data;
+                this.getEmployees();
+              })
+              .catch((err) => {
+                this.loading = false;
+                console.log(err);
+              })
+        },
+        deleteEmployee: function(id) {
+          this.loading = true;
+          this.$http.delete('/api/employee/${id}/')
+              .then((response) => {
+                this.loading = false;
+                this.getEmployees();
+              })
+              .catch((err) => {
+                this.loading = false;
+                console.log(err);
+              })
+        }
+      }
+    });
+  </script>
+  </body>
+</html>
